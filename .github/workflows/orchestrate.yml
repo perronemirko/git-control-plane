@@ -1,0 +1,21 @@
+name: Control Plane Orchestrator
+
+on:
+  workflow_dispatch:
+
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Create event
+        run: |
+          echo "{\"id\":\"$(uuidgen)\",\"type\":\"event.created\"}" > event.json
+
+      - name: Dispatch to Node A
+        run: |
+          curl -X POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: token ${{ secrets.GH_TOKEN }}" \
+            https://api.github.com/repos/perronemirko/git-node-a-producer/dispatches \
+            -d "{\"event_type\":\"new_event\",\"client_payload\":$(cat event.json)}"
